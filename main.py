@@ -55,7 +55,6 @@ async def analyze(file: UploadFile = File(...)):
         response = requests.post(url, json=payload, timeout=30)
         result = response.json()
 
-        # Show full error if something went wrong
         if "error" in result:
             return JSONResponse(status_code=400, content={"error": result["error"].get("message", str(result["error"]))})
 
