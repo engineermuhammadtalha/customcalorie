@@ -19,7 +19,7 @@ async def home():
 
 @app.get("/health")
 async def health():
-    return {"status": "ok"}
+    return {"status": "ok", "api_key_set": bool(os.getenv("GOOGLE_API_KEY"))}
 
 @app.post("/analyze")
 async def analyze(file: UploadFile = File(...)):
@@ -30,7 +30,7 @@ async def analyze(file: UploadFile = File(...)):
         image_data = await file.read()
         image_base64 = base64.b64encode(image_data).decode()
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={api_key}"
 
         payload = {
             "contents": [{
@@ -52,8 +52,15 @@ async def analyze(file: UploadFile = File(...)):
             }]
         }
 
-        response = requests.post(url, json=payload)
+        response = requests.post(url, json=payload, timeout=30)
         result = response.json()
+
+        # Show full error if something went wrong
+        if "error" in result:
+            return JSONResponse(status_code=400, content={"error": result["error"].get("message", str(result["error"]))})
+
+        if "candidates" not in result:
+            return JSONResponse(status_code=500, content={"error": f"Unexpected response: {json.dumps(result)[:200]}"})
 
         text = result["candidates"][0]["content"]["parts"][0]["text"].strip()
         if "```json" in text:
