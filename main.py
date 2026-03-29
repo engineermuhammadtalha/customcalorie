@@ -30,7 +30,7 @@ async def analyze(file: UploadFile = File(...)):
         image_data = await file.read()
         image_base64 = base64.b64encode(image_data).decode()
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={api_key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
 
         payload = {
             "contents": [{
