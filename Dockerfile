@@ -1,9 +1,8 @@
-FROM python:3.11-slim
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.11-slim
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir --timeout=60 -r requirements.txt
+RUN pip install --no-cache-dir requests==2.31.0 python-multipart==0.0.9 python-dotenv==1.0.1
 
 COPY . .
 
