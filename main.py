@@ -26,11 +26,13 @@ async def analyze(file: UploadFile = File(...)):
     api_key = os.getenv("GOOGLE_API_KEY")
     if not api_key or api_key == "YOUR_API_KEY":
         return JSONResponse(status_code=400, content={"error": "API Key missing."})
+
     try:
         image_data = await file.read()
         image_base64 = base64.b64encode(image_data).decode()
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
+        # gemini-1.5-flash has 1500 free requests/day vs gemini-2.0-flash's tiny quota
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
 
         payload = {
             "contents": [{
@@ -59,7 +61,7 @@ async def analyze(file: UploadFile = File(...)):
             return JSONResponse(status_code=400, content={"error": result["error"].get("message", str(result["error"]))})
 
         if "candidates" not in result:
-            return JSONResponse(status_code=500, content={"error": f"Unexpected response: {json.dumps(result)[:200]}"})
+            return JSONResponse(status_code=500, content={"error": f"Unexpected response: {json.dumps(result)[:300]}"})
 
         text = result["candidates"][0]["content"]["parts"][0]["text"].strip()
         if "```json" in text:
