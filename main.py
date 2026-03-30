@@ -31,8 +31,8 @@ async def analyze(file: UploadFile = File(...)):
         image_data = await file.read()
         image_base64 = base64.b64encode(image_data).decode()
 
-        # gemini-1.5-flash has 1500 free requests/day vs gemini-2.0-flash's tiny quota
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+        # gemini-2.5-flash is the correct free tier model as of 2026
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
 
         payload = {
             "contents": [{
